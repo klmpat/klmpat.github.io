@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Snap</title>
+    <style>
+        /* CSS remains unchanged as it contains no text */
+        :root {
+            --dark-bg: #0a0a12;
+            --darker-bg: #050508;
+            --primary: #1a237e;
+            --accent: #00b0ff;
+            --text: #e0e0e0;
+            --highlight: #3d5afe;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text);
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(26, 35, 126, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 176, 255, 0.2) 0%, transparent 50%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: rgba(10, 10, 18, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--primary);
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), #7c4dff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+        
+        nav a:hover {
+            color: var(--accent);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: width 0.3s;
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        .hero {
+            padding: 180px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 176, 255, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            animation: pulse 15s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.1;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 0.2;
+            }
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--accent), #7c4dff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--highlight));
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .download-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .download-btn:hover::before {
+            left: 100%;
+        }
+        
+        .game-preview {
+            margin: 80px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+        
+        .game-preview img {
+            width: 100%;
+            display: block;
+            transition: transform 0.5s;
+        }
+        
+        .game-preview:hover img {
+            transform: scale(1.03);
+        }
+        
+        .game-preview::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0, 176, 255, 0.1), rgba(26, 35, 126, 0.3));
+            pointer-events: none;
+        }
+        
+        .features {
+            padding: 80px 0;
+            background-color: var(--darker-bg);
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 60px;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 10px;
+            padding: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(58, 71, 147, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .feature-title {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .feature-desc {
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+        
+        .system-req {
+            padding: 80px 0;
+        }
+        
+        .req-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        
+        .req-table th, .req-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(58, 71, 147, 0.3);
+        }
+        
+        .req-table th {
+            background-color: rgba(26, 35, 126, 0.2);
+            color: var(--accent);
+        }
+        
+        .req-table tr:hover {
+            background-color: rgba(0, 176, 255, 0.05);
+        }
+        
+        footer {
+            background-color: var(--darker-bg);
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid var(--primary);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .copyright {
+            opacity: 0.7;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            h1 {
+                font-size: 36px;
+            }
+            
+            .subtitle {
+                font-size: 18px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">GS</div>
+                    <div class="logo-text">Gravity Snap</div>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#about">About the Game</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#requirements">System Requirements</a></li>
+                        <li><a href="#download">Download</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" id="about">
+        <div class="container">
+            <h1>Gravity Shift</h1>
+            <p class="subtitle">An innovative platformer with gravity-shifting mechanics and building capabilities. Explore a world you can reshape, overcome obstacles, and create unique paths to victory!</p>
+            <a href="#download" class="download-btn">Download Now</a>
+            
+            <div class="game-preview">
+                <img src="screenshot.png" alt="Gravity Snap Gameplay">
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Game Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌌</div>
+                    <h3 class="feature-title">Gravity Snaping</h3>
+                    <p class="feature-desc">Flip the world upside down! Change gravity direction to reach new areas and discover secrets.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧱</div>
+                    <h3 class="feature-title">Building</h3>
+                    <p class="feature-desc">Create your own platforms and structures to overcome obstacles. Your creativity is key to solving puzzles.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3 class="feature-title">Smooth Animations</h3>
+                    <p class="feature-desc">Enjoy fluid and dynamic character and environment animations that bring the game to life.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Dynamic World</h3>
+                    <p class="feature-desc">Explore diverse levels, each with unique mechanics and visual styles.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧩</div>
+                    <h3 class="feature-title">Puzzles</h3>
+                    <p class="feature-desc">Solve challenging puzzles requiring a combination of gravity shifting and building skills.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Stylish Graphics</h3>
+                    <p class="feature-desc">A black-and-blue visual style with accents creates the game's unique atmosphere.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="system-req" id="requirements">
+        <div class="container">
+            <h2 class="section-title">System Requirements</h2>
+            <table class="req-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Minimum</th>
+                        <th>Recommended</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OS</td>
+                        <td>Windows 7/8/10 (64-bit)</td>
+                        <td>Windows 10 (64-bit)</td>
+                    </tr>
+                    <tr>
+                        <td>Processor</td>
+                        <td>Intel Core i3 or equivalent</td>
+                        <td>Intel Core i5 or equivalent</td>
+                    </tr>
+                    <tr>
+                        <td>Memory</td>
+                        <td>1 GB RAM</td>
+                        <td>4 GB RAM</td>
+                    </tr>
+                    <tr>
+                        <td>Graphics</td>
+                        <td>Intel HD Graphics 4000 or equivalent</td>
+                        <td>NVIDIA GTX 660 / AMD Radeon HD 7850</td>
+                    </tr>
+                    <tr>
+                        <td>Storage</td>
+                        <td>500 mb</td>
+                        <td>2 GB</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="hero" id="download" style="padding: 100px 0;">
+        <div class="container" style="text-align: center;">
+            <h2 style="font-size: 36px; margin-bottom: 30px;">Ready for Adventure?</h2>
+            <p class="subtitle" style="margin-bottom: 40px;">Download Gravity Snap now and begin your journey in a world of shifting gravity!</p>
+            <a download="Gravity Snap.exe" class="download-btn">Download (v1.0, 19.4 mb)</a>
+            <p style="margin-top: 20px; opacity: 0.7;">Windows 7/8/10/11 • Version 1.0 • Last Updated: 16.06.2025</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Support</a>
+                <a href="#">Social Media</a>
+            </div>
+            <p class="copyright">© 2025 Gravity Snap. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
